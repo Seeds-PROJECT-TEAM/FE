@@ -1,5 +1,11 @@
 "use client";
 
+import 개념집 from "../practice/개념집.svg";
+import 문제집 from "../practice/문제집.svg";
+import 어휘집 from "../practice/어휘집.svg";
+import 마라톤 from "../practice/마라톤.svg";
+import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 import {
   Calculator,
@@ -19,6 +25,7 @@ import {
   Play,
   ChevronRight,
 } from "lucide-react";
+import { link } from "fs";
 
 export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -32,29 +39,31 @@ export default function DashboardPage() {
     { icon: Settings, label: "설정", sublabel: "Settings" },
   ];
 
+  const quickAccessImages = [개념집, 문제집, 어휘집, 마라톤];
+
   const quickAccess = [
     {
       title: "개념집",
       subtitle: "Concept Book",
-      icon: BookOpen,
+      image: 개념집,
       color: "bg-blue-500",
     },
     {
       title: "어휘집",
       subtitle: "Vocabulary",
-      icon: Brain,
+      image: 어휘집,
       color: "bg-green-500",
     },
     {
       title: "문제집",
       subtitle: "Problem Set",
-      icon: FileText,
+      image: 문제집,
       color: "bg-orange-500",
     },
     {
       title: "마라톤",
       subtitle: "Marthon",
-      icon: Trophy,
+      image: 마라톤,
       color: "bg-purple-500",
     },
   ];
@@ -287,7 +296,7 @@ export default function DashboardPage() {
                     </span>
                   </h3>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  {/* <div className="grid grid-cols-2 gap-3">
                     {quickAccess.map((item, index) => (
                       <div
                         key={index}
@@ -296,7 +305,11 @@ export default function DashboardPage() {
                         <div
                           className={`w-10 h-10 ${item.color} rounded-lg flex items-center justify-center mb-3`}
                         >
-                          <item.icon className="w-5 h-5 text-white" />
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-6 h-6 object-contain"
+                          />
                         </div>
                         <h4 className="font-medium text-gray-900 text-sm mb-1">
                           {item.title}
@@ -304,6 +317,77 @@ export default function DashboardPage() {
                         <p className="text-xs text-gray-500">{item.subtitle}</p>
                       </div>
                     ))}
+                  </div>
+                </div> */}
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {/* 개념집 카드 */}
+                    <Link href="/concept" className="block">
+                      <div className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
+                        <div className="w-10 h-10 bg-gradient-to-b from-teal-300 to-teal-600 rounded-lg flex items-center justify-center mb-3">
+                          <Image
+                            src={개념집}
+                            alt="개념집"
+                            className="w-6 h-6 object-contain"
+                          />
+                        </div>
+                        <h4 className="font-medium text-gray-900 text-sm mb-1">
+                          개념집
+                        </h4>
+                        <p className="text-xs text-gray-500">Concept Book</p>
+                      </div>
+                    </Link>
+
+                    {/* 어휘집 카드 */}
+                    <Link href="/vocabulary" className="block">
+                      <div className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
+                        <div className="w-10 h-10 bg-gradient-to-b from-yellow-300 to-yellow-500 rounded-lg flex items-center justify-center mb-3">
+                          <Image
+                            src={어휘집}
+                            alt="어휘집"
+                            className="w-6 h-6 object-contain"
+                          />
+                        </div>
+                        <h4 className="font-medium text-gray-900 text-sm mb-1">
+                          어휘집
+                        </h4>
+                        <p className="text-xs text-gray-500">Vocabulary</p>
+                      </div>
+                    </Link>
+
+                    {/* 문제집 카드 */}
+                    <Link href="/problems" className="block">
+                      <div className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
+                        <div className="w-10 h-10 bg-gradient-to-b from-orange-300 to-orange-600 rounded-lg flex items-center justify-center mb-3">
+                          <Image
+                            src={문제집}
+                            alt="문제집"
+                            className="w-6 h-6 object-contain"
+                          />
+                        </div>
+                        <h4 className="font-medium text-gray-900 text-sm mb-1">
+                          문제집
+                        </h4>
+                        <p className="text-xs text-gray-500">Problem Set</p>
+                      </div>
+                    </Link>
+
+                    {/* 마라톤 카드 */}
+                    <Link href="/marathon" className="block">
+                      <div className="p-4 border border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer">
+                        <div className="w-10 h-10 bg-gradient-to-b from-blue-300 to-blue-600 rounded-lg flex items-center justify-center mb-3">
+                          <Image
+                            src={마라톤}
+                            alt="마라톤"
+                            className="w-6 h-6 object-contain"
+                          />
+                        </div>
+                        <h4 className="font-medium text-gray-900 text-sm mb-1">
+                          마라톤
+                        </h4>
+                        <p className="text-xs text-gray-500">Marathon</p>
+                      </div>
+                    </Link>
                   </div>
                 </div>
 
