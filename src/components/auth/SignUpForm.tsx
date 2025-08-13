@@ -5,14 +5,22 @@ import { Submit } from "./Submit";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { ChangeEvent } from "react";
+import { useFormValidate } from "@/hooks/useFormVaildate";
+import { SignUpSchema } from "@/schemas/auth";
+import { TSignUpFormError } from "@/types/form";
+import { FormMessage } from "./FormMessage";
 
 export default function SignUpForm() {
+  const { errors, validateField } =
+    useFormValidate<TSignUpFormError>(SignUpSchema);
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    console.log("name", name);
-    console.log("value", value);
+    validateField(name, value);
+    /* console.log("name", name);
+    console.log("value", value); */
   };
 
+  console.log("errors", errors);
   return (
     <FormCard
       title="회원가입"
@@ -26,8 +34,10 @@ export default function SignUpForm() {
             id="name"
             name="name"
             placeholder="이름을 입력해주세요"
+            error={!!errors?.name}
             onChange={handleChange}
           />
+          {errors?.name && <FormMessage message={errors?.name[0]} />}
         </div>
         {/* 이메일 */}
         <div className="space-y-1">
@@ -37,8 +47,10 @@ export default function SignUpForm() {
             name="email"
             type="email"
             placeholder="nertmath@abc.com"
+            error={!!errors?.email}
             onChange={handleChange}
           />
+          {errors?.email && <FormMessage message={errors?.email[0]} />}
         </div>
         {/* 비밀번호 */}
         <div className="space-y-1">
@@ -47,8 +59,10 @@ export default function SignUpForm() {
             id="password"
             name="password"
             placeholder="********"
+            error={!!errors?.password}
             onChange={handleChange}
           />
+          {errors?.password && <FormMessage message={errors?.password[0]} />}
         </div>
         <Submit className="w-full">가입하기</Submit>
       </form>
