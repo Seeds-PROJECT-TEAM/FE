@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { ChangeEvent, useEffect } from "react";
 import { useFormValidate } from "@/hooks/useFormVaildate";
 import { LoginSchema } from "@/schemas/auth";
-import { TLoginFormError, TSignUpFormError } from "@/types/form";
+import { TLoginFormError } from "@/types/form";
 import { FormMessage } from "./FormMessage";
 import { useFormState } from "react-dom";
 

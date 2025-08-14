@@ -15,7 +15,7 @@ export const signUp = async (_: any, formData: FormData) => {
 
   if (!validatedFields.success) {
     return {
-      errorMesage: "잘못된 입력값이 있습니다.",
+      errorMessage: "잘못된 입력값이 있습니다.",
     };
   }
 
