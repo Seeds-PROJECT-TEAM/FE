@@ -11,7 +11,13 @@ export const signUp = async (_: any, formData: FormData) => {
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    passwordConfirm: formData.get("passwordConfirm"),
+    phone: formData.get("phone"),
   });
+
+  // 동의 정보는 별도로 처리 (추후 SignUpForm에서 hidden input으로 전달)
+  const privacyConsent = formData.get("privacyConsent") === "true";
+  const parentalConsent = formData.get("parentalConsent") === "true";
 
   if (!validatedFields.success) {
     return {
@@ -19,8 +25,14 @@ export const signUp = async (_: any, formData: FormData) => {
     };
   }
 
+  if (!privacyConsent) {
+    return {
+      errorMessage: "개인정보 처리 동의는 필수입니다.",
+    };
+  }
+
   // 2. 존재하는 사용자인지 체크
-  const { email, name, password } = validatedFields.data;
+  const { email, name, password, phone } = validatedFields.data;
 
   const existingUser = await getUserByEmail(email);
   if (existingUser) {
@@ -39,6 +51,9 @@ export const signUp = async (_: any, formData: FormData) => {
       name,
       email,
       password,
+      phone,
+      privacyConsent,
+      parentalConsent,
       createdAt: new Date(),
       updatedAt: new Date(),
     };

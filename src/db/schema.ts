@@ -5,6 +5,9 @@ export interface User {
   email: string;
   password: string;
   name: string;
+  phone: string;
+  privacyConsent: boolean;
+  parentalConsent?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -13,4 +16,7 @@ export interface CreateUserInput {
   email: string;
   password: string;
   name: string;
+  phone: string;
+  privacyConsent: boolean;
+  parentalConsent?: boolean;
 }

@@ -54,6 +54,13 @@ export default function SignUpForm() {
       footer={{ label: "이미 계정이 있으신가요?", href: "/login" }}
     >
       <form action={action} className="space-y-6">
+        {/* 동의 정보를 hidden input으로 전달 */}
+        {consentData && (
+          <>
+            <input type="hidden" name="privacyConsent" value={consentData.privacyConsent.toString()} />
+            <input type="hidden" name="parentalConsent" value={consentData.parentalConsent.toString()} />
+          </>
+        )}
         {/* 이름 */}
         <div className="space-y-1">
           <Label htmlFor="name">이름</Label>
