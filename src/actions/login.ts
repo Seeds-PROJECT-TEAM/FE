@@ -47,5 +47,5 @@ export const login = async (_: any, formData: FormData) => {
       errorMessage: "문제가 발생했습니다.",
     };
   }
-  redirect("/dashboard");
+  redirect("/profile-setup");
 };
