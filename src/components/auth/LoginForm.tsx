@@ -10,6 +10,7 @@ import { LoginSchema } from "@/schemas/auth";
 import { TLoginFormError } from "@/types/form";
 import { FormMessage } from "./FormMessage";
 import { useFormState } from "react-dom";
+import { ConsentForm } from "./ConsentForm";
 
 import { login } from "@/actions/login";
 import toast from "react-hot-toast";
