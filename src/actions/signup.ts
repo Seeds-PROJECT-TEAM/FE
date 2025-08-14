@@ -6,11 +6,6 @@ import { getDB } from "@/db";
 
 export const signUp = async (_: any, formData: FormData) => {
   // 1. vaildate Fields
-  console.log("FormData 받은 값:", {
-    name: formData.get("name"),
-    email: formData.get("email"),
-    password: formData.get("password"),
-  });
 
   const validatedFields = SignUpSchema.safeParse({
     name: formData.get("name"),
@@ -18,10 +13,7 @@ export const signUp = async (_: any, formData: FormData) => {
     password: formData.get("password"),
   });
 
-  console.log("유효성 검증 결과:", validatedFields);
-
   if (!validatedFields.success) {
-    console.log("유효성 검증 실패:", validatedFields.error);
     return {
       errorMesage: "잘못된 입력값이 있습니다.",
     };
@@ -37,7 +29,7 @@ export const signUp = async (_: any, formData: FormData) => {
     };
   }
 
-  // const hashPassword =await 나중에 하자..
+  // const hashPassword = await 암호 해시값처리는 나중에 하자..
 
   // 3. insert db
   try {

@@ -23,3 +23,8 @@ export const SignUpSchema = z.object({
       message: "비밀번호는 최소 1개 이상의 특수문자를 포함해야 합니다.",
     }),
 });
+
+export const LoginSchema = z.object({
+  email: z.string().email({ message: "올바른 이메일 형식을 입력해주세요." }),
+  password: z.string().min(1, { message: "패스워드를 입력해주세요." }),
+});
