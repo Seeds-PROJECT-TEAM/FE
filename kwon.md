@@ -210,6 +210,360 @@ interface User {
 2. 불필요한 import 제거
 3. 에러 처리 개선
 
+---
+
+# 메인 애플리케이션 개발 계획
+
+## 🎯 개발 목표
+- **메인화면 (대시보드)**: 학습 진도, 최근 문제, 성취도 표시
+- **마이페이지**: 프로필 관리, 설정, 학습 통계
+
+---
+
+## 📁 컴포넌트 구조 설계
+
+### 1. 공통 컴포넌트 (Shared Components)
+```
+src/components/
+├── layout/
+│   ├── Header.tsx              # 상단 네비게이션 바
+│   ├── Sidebar.tsx             # 사이드 메뉴 (모바일: 햄버거)
+│   ├── Footer.tsx              # 하단 정보
+│   └── Layout.tsx              # 전체 레이아웃 래퍼
+├── ui/                         # shadcn-ui 기본 컴포넌트들
+├── common/
+│   ├── LoadingSpinner.tsx      # 로딩 상태
+│   ├── ErrorBoundary.tsx       # 에러 처리
+│   ├── UserAvatar.tsx          # 사용자 아바타
+│   └── ProgressBar.tsx         # 진도 표시바
+└── features/                   # 기능별 컴포넌트
+    ├── dashboard/
+    │   ├── WelcomeCard.tsx     # 환영 메시지
+    │   ├── StudyProgress.tsx   # 학습 진도
+    │   ├── RecentProblems.tsx  # 최근 풀어본 문제들
+    │   └── AchievementBadge.tsx # 성취 뱃지
+    └── profile/
+        ├── ProfileHeader.tsx   # 프로필 헤더
+        ├── EditProfileForm.tsx # 프로필 수정 폼
+        └── StudyStats.tsx      # 학습 통계
+```
+
+### 2. 페이지 컴포넌트 구조
+```
+src/app/
+├── (dashboard)/
+│   ├── page.tsx               # 메인 대시보드
+│   └── layout.tsx             # 대시보드 전용 레이아웃
+├── profile/
+│   ├── page.tsx               # 마이페이지
+│   ├── edit/
+│   │   └── page.tsx           # 프로필 편집
+│   └── settings/
+│       └── page.tsx           # 설정 페이지
+└── (auth)/                    # 기존 인증 라우트
+    ├── login/
+    └── signup/
+```
+
+---
+
+## 🛣️ 라우팅 전략 (Next.js App Router)
+
+### 1. 라우트 구조
+```typescript
+// 주요 라우트 정의
+const routes = {
+  // 인증되지 않은 사용자
+  AUTH: {
+    LOGIN: '/login',
+    SIGNUP: '/signup',
+  },
+  
+  // 인증된 사용자 (Protected Routes)
+  DASHBOARD: '/',
+  PROFILE: {
+    VIEW: '/profile',
+    EDIT: '/profile/edit', 
+    SETTINGS: '/profile/settings',
+  },
+  
+  // 학습 관련 (추후 확장)
+  STUDY: {
+    PROBLEMS: '/problems',
+    RESULTS: '/results',
+  }
+}
+```
+
+### 2. 라우트 보호 (Route Protection)
+```typescript
+// middleware.ts - 인증 미들웨어
+export function middleware(request: NextRequest) {
+  const token = request.cookies.get('session')?.value;
+  
+  // 보호된 라우트 목록
+  const protectedPaths = ['/', '/profile'];
+  const authPaths = ['/login', '/signup'];
+  
+  if (protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))) {
+    if (!token) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+  
+  if (authPaths.includes(request.nextUrl.pathname)) {
+    if (token) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  }
+}
+```
+
+### 3. 레이아웃 계층 구조
+```typescript
+// app/layout.tsx (Root Layout)
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <Providers>          {/* 상태 관리 프로바이더 */}
+          <ErrorBoundary>    {/* 전역 에러 처리 */}
+            {children}
+          </ErrorBoundary>
+        </Providers>
+      </body>
+    </html>
+  );
+}
+
+// app/(dashboard)/layout.tsx (Dashboard Layout)
+export default function DashboardLayout({ children }) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <div className="flex">
+        <Sidebar />
+        <main className="flex-1 p-6">
+          {children}
+        </main>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+```
+
+---
+
+## 🎛️ 상태 관리 전략
+
+### 1. 상태 관리 도구 선택: **Zustand**
+```bash
+npm install zustand
+```
+
+**선택 이유:**
+- 가볍고 간단한 API
+- TypeScript 친화적
+- Redux DevTools 지원
+- 보일러플레이트 코드 최소
+
+### 2. 스토어 구조 설계
+```typescript
+// stores/authStore.ts - 인증 상태
+interface AuthState {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (userData: User) => void;
+  logout: () => void;
+  updateProfile: (data: Partial<User>) => void;
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
+  user: null,
+  isLoading: false,
+  isAuthenticated: false,
+  
+  login: (userData) => set({
+    user: userData,
+    isAuthenticated: true,
+  }),
+  
+  logout: () => set({
+    user: null,
+    isAuthenticated: false,
+  }),
+  
+  updateProfile: (data) => set((state) => ({
+    user: state.user ? { ...state.user, ...data } : null
+  })),
+}));
+
+// stores/studyStore.ts - 학습 상태  
+interface StudyState {
+  currentProgress: number;
+  recentProblems: Problem[];
+  achievements: Achievement[];
+  fetchDashboardData: () => Promise<void>;
+}
+
+// stores/uiStore.ts - UI 상태
+interface UIState {
+  sidebarOpen: boolean;
+  theme: 'light' | 'dark';
+  toggleSidebar: () => void;
+  setTheme: (theme: 'light' | 'dark') => void;
+}
+```
+
+### 3. 데이터 페칭 전략
+```typescript
+// hooks/useUser.ts - 사용자 데이터 훅
+export const useUser = () => {
+  const { user, isLoading, updateProfile } = useAuthStore();
+  
+  const mutateProfile = useMutation({
+    mutationFn: (data: UpdateProfileData) => updateUserProfile(data),
+    onSuccess: (updatedUser) => {
+      updateProfile(updatedUser);
+      toast.success('프로필이 업데이트되었습니다.');
+    },
+  });
+  
+  return {
+    user,
+    isLoading,
+    updateProfile: mutateProfile.mutate,
+    isUpdating: mutateProfile.isPending,
+  };
+};
+```
+
+---
+
+## 🎨 UI/UX 설계 가이드라인
+
+### 1. 디자인 시스템
+```typescript
+// styles/design-system.ts
+export const designTokens = {
+  colors: {
+    primary: {
+      50: '#eff6ff',
+      500: '#3b82f6', 
+      900: '#1e3a8a',
+    },
+    semantic: {
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444',
+    }
+  },
+  
+  spacing: {
+    xs: '0.5rem',
+    sm: '1rem', 
+    md: '1.5rem',
+    lg: '2rem',
+    xl: '3rem',
+  },
+  
+  typography: {
+    heading: 'font-bold text-gray-900',
+    body: 'text-gray-700',
+    caption: 'text-sm text-gray-500',
+  }
+};
+```
+
+### 2. 반응형 디자인
+```typescript
+// 브레이크포인트 정의
+const breakpoints = {
+  mobile: '768px',
+  tablet: '1024px', 
+  desktop: '1280px',
+};
+
+// 모바일 우선 설계
+const ResponsiveGrid = () => (
+  <div className="
+    grid grid-cols-1 gap-4
+    md:grid-cols-2 md:gap-6
+    lg:grid-cols-3 lg:gap-8
+  ">
+    {/* 컨텐츠 */}
+  </div>
+);
+```
+
+---
+
+## 🔄 개발 단계별 계획
+
+### Phase 1: 기초 구조 (1주차)
+1. **레이아웃 컴포넌트** 구축
+   - Header, Sidebar, Layout 컴포넌트
+   - 반응형 네비게이션
+2. **라우팅 설정**
+   - 미들웨어 구성
+   - 보호된 라우트 설정
+3. **상태 관리 구축**
+   - Zustand 스토어 설정
+   - 인증 상태 관리
+
+### Phase 2: 대시보드 개발 (1주차)
+1. **대시보드 페이지** 구현
+   - 환영 메시지 카드
+   - 학습 진도 표시
+   - 최근 활동 목록
+2. **공통 컴포넌트** 개발  
+   - 진도바, 아바타, 로딩 등
+
+### Phase 3: 마이페이지 개발 (1주차)  
+1. **프로필 페이지** 구현
+   - 사용자 정보 표시
+   - 프로필 편집 폼
+   - 학습 통계 차트
+2. **설정 페이지** 구현
+   - 계정 설정
+   - 테마 변경
+
+### Phase 4: 최적화 & 테스트 (0.5주차)
+1. **성능 최적화**
+   - 이미지 최적화
+   - 코드 스플리팅
+   - 캐싱 전략
+2. **테스트 코드** 작성
+3. **접근성** 개선
+
+---
+
+## 🛠️ 기술 스택 요약
+
+### 프론트엔드
+- **Framework**: Next.js 14 (App Router)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **상태관리**: Zustand  
+- **HTTP Client**: Fetch API / Axios
+- **Form**: React Hook Form + Zod
+- **Toast**: react-hot-toast
+
+### 개발 도구
+- **TypeScript**: 타입 안정성
+- **ESLint + Prettier**: 코드 품질
+- **Husky**: Git hooks
+
+---
+
+## 📊 예상 개발 일정
+- **총 소요 시간**: 3.5주
+- **핵심 기능 완성**: 2.5주
+- **테스트 및 최적화**: 1주
+
+이 계획을 바탕으로 단계적으로 개발을 진행하면, 확장 가능하고 유지보수성이 높은 애플리케이션을 구축할 수 있습니다.
+
 ## 앞으로의 개발 계획
 
 ### 백엔드 로직 분리 방향
