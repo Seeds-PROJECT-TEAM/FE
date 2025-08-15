@@ -43,7 +43,7 @@ export default function SignUpForm() {
   };
 
   useEffect(() => {
-    if (error?.errorMessage) {
+    if (error?.errorMessage && !error.errorMessage.includes('NEXT_REDIRECT')) {
       toast.error(error.errorMessage);
     }
   }, [error]);

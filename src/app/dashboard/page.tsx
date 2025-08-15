@@ -1,3 +1,6 @@
+import Link from "next/link";
+import QuickAccess from "@/components/dashboard/QuickAccess";
+
 const mathUnits = [
   {
     id: "1.1",
@@ -40,11 +43,15 @@ export default function Dashboard() {
           {/* 진행 중인 박스 */}
           <div className="bg-white border rounded-lg p-6 flex gap-6 shadow-sm">
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-gray-900">흠</h2>
-              <p className="text-gray-600 text-sm mt-2">뭐넣지</p>
-              <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
-                계속하기
-              </button>
+              <h2 className="text-lg font-bold text-gray-900">문제집</h2>
+              <p className="text-gray-600 text-sm mt-2">
+                workbooks 테스트 화면 바로가기
+              </p>
+              <Link href="/workbooks">
+                <button className="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors">
+                  바로가기
+                </button>
+              </Link>
             </div>
             <div className="flex-1">
               {/* 이미지 영역 */}
@@ -91,7 +98,7 @@ export default function Dashboard() {
 
           {/* 퀵엑서스? */}
           <div className="bg-white border rounded-lg p-4 shadow-sm">
-            <h3 className="font-bold text-gray-900 mb-2">바로가기</h3>
+            <QuickAccess />
           </div>
 
           {/* 흠.. 달력?*/}

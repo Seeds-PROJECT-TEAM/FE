@@ -3,6 +3,7 @@
 import { getUserByEmail } from "@/data/user";
 import { SignUpSchema } from "@/schemas/auth";
 import { getDB } from "@/db";
+import { redirect } from "next/navigation";
 
 export const signUp = async (_: any, formData: FormData) => {
   // 1. vaildate Fields
@@ -59,15 +60,13 @@ export const signUp = async (_: any, formData: FormData) => {
     };
 
     const result = await collection.insertOne(userData);
-
-    // 4. 성공/실패처리
-    return {
-      success: "회원가입이 완료되었습니다.",
-    };
   } catch (error) {
     console.error("회원가입 에러:", error);
     return {
       errorMessage: "회원가입에 실패했습니다.",
     };
   }
+
+  // 4. 성공시 프로필 설정 페이지로 리다이렉트
+  redirect("/profile-setup");
 };
