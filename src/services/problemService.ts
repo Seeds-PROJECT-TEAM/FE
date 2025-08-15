@@ -15,14 +15,22 @@ export interface SubmitAnswerResponse {
 }
 
 export const problemService = {
-  // 특정 문제 조회
+  // 특정 문제 조회 (API 명세에 맞게 수정)
   getProblem: async (problemId: string) => {
-    return api.get<Problem>(`/problems/${problemId}`)
+    return api.get<Problem>(`/v1/problems/${problemId}`, {
+      headers: {
+        'X-Request-Id': `req_problem_${Date.now()}`
+      }
+    })
   },
 
   // 문제 답안 제출
   submitAnswer: async (problemId: string, request: SubmitAnswerRequest) => {
-    return api.post<SubmitAnswerResponse>(`/problems/${problemId}/submit`, request)
+    return api.post<SubmitAnswerResponse>(`/v1/problems/${problemId}/submit`, request, {
+      headers: {
+        'X-Request-Id': `req_submit_${Date.now()}`
+      }
+    })
   }
 }
 

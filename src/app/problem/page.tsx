@@ -11,20 +11,40 @@ import ResultDisplay from "@/components/problem/ResultDisplay";
 import Loading from "@/components/common/Loading";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import problemService from "@/services/problemService";
+import { adaptProblemFromApi } from "@/utils/problemAdapter";
 
-const sampleProblem: Problem = {
-  id: "1",
-  title: "이차방정식의 해",
-  content: "다음 이차방정식의 해를 구하시오: $x^2 - 5x + 6 = 0$",
-  options: ["$x = 1, 2$", "$x = 2, 3$", "$x = 3, 4$", "$x = 1, 6$"],
-  type: "multiple-choice",
-  difficulty: "medium",
-  subject: "수학",
+// API 명세에 맞는 JSON 예시 데이터
+const sampleApiResponse: Problem = {
+  problemId: "64fa0p111111111111111111",
+  unitId: "64unit001111111111111111",
+  grade: 2,
+  chapter: 3,
+  context: { 
+    source: "교과서", 
+    for: ["diagnostic", "practice"] 
+  },
+  cognitiveType: "이해",
+  level: "중",
+  type: "객관식",
   tags: ["이차방정식", "인수분해"],
-  correctAnswer: 1,
-  explanation:
-    "주어진 방정식을 인수분해하면 $(x-2)(x-3) = 0$이므로 $x = 2$ 또는 $x = 3$입니다.",
+  content: {
+    stem: { 
+      text: "다음 이차방정식의 해를 구하시오: $x^2 - 5x + 6 = 0$" 
+    },
+    choices: [
+      { key: "①", text: "$x = 1, 2$" },
+      { key: "②", text: "$x = 2, 3$" },
+      { key: "③", text: "$x = 3, 4$" },
+      { key: "④", text: "$x = 1, 6$" }
+    ]
+  },
+  imageUrl: "/images/problems/quadratic_equation.png",
+  createdAt: "2025-07-14T10:25:00Z",
+  updatedAt: "2025-07-14T10:25:00Z"
 };
+
+// 변환된 샘플 데이터 (기존 호환성용)
+const sampleProblem = adaptProblemFromApi(sampleApiResponse);
 
 export default function ProblemPage() {
   const searchParams = useSearchParams();
@@ -53,7 +73,9 @@ export default function ProblemPage() {
         const response = await problemService.getProblem(problemId);
         
         if (response.success && response.data) {
-          setProblem(response.data);
+          // API 응답을 기존 컴포넌트 형식으로 변환
+          const adaptedProblem = adaptProblemFromApi(response.data);
+          setProblem(adaptedProblem);
         } else {
           // API 실패 시 샘플 데이터 사용
           setProblem(sampleProblem);
@@ -158,7 +180,7 @@ export default function ProblemPage() {
           tags={problem.tags}
         />
 
-        <ProblemContent content={problem.content} />
+        <ProblemContent content={problem.content} imageUrl={problem.imageUrl} />
 
         {problem.type === "multiple-choice" && problem.options && (
           <MultipleChoiceOptions

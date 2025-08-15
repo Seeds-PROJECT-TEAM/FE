@@ -61,22 +61,26 @@ async function fetchApi<T>(
 }
 
 export const api = {
-  get: <T>(endpoint: string) => fetchApi<T>(endpoint),
+  get: <T>(endpoint: string, options?: RequestInit) => 
+    fetchApi<T>(endpoint, options),
   
-  post: <T>(endpoint: string, data?: any) => 
+  post: <T>(endpoint: string, data?: any, options?: RequestInit) => 
     fetchApi<T>(endpoint, {
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
+      ...options,
     }),
     
-  put: <T>(endpoint: string, data?: any) => 
+  put: <T>(endpoint: string, data?: any, options?: RequestInit) => 
     fetchApi<T>(endpoint, {
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
+      ...options,
     }),
     
-  delete: <T>(endpoint: string) => 
+  delete: <T>(endpoint: string, options?: RequestInit) => 
     fetchApi<T>(endpoint, {
       method: 'DELETE',
+      ...options,
     }),
 }

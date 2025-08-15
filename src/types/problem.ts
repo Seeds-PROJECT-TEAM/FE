@@ -1,14 +1,37 @@
 export interface Problem {
-  id: string;
-  title: string;
-  content: string; // LaTeX 수식이 포함된 문제 내용
-  options?: string[]; // 객관식 선택지 (LaTeX 포함 가능)
-  type: 'multiple-choice' | 'short-answer' | 'essay';
-  difficulty: 'easy' | 'medium' | 'hard';
-  subject: string;
+  problemId: string;
+  unitId: string;
+  grade: number;
+  chapter: number;
+  context: {
+    source: string;
+    for: string[];
+  };
+  cognitiveType: string;
+  level: string;
+  type: string;
   tags: string[];
-  correctAnswer?: string | number; // 정답
-  explanation?: string; // 해설 (LaTeX 포함 가능)
+  content: {
+    stem: {
+      text: string;
+    };
+    choices?: Array<{
+      key: string;
+      text: string;
+    }>;
+  };
+  imageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+  
+  // 클라이언트 전용 필드 (기존 호환성을 위해)
+  id?: string;
+  title?: string;
+  options?: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
+  subject?: string;
+  correctAnswer?: string | number;
+  explanation?: string;
 }
 
 export interface ProblemAttempt {
